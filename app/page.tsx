@@ -1,10 +1,9 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
-import {cloneSeed,DEMO_DATE,money,number,randId,type Asset,type Contract,type Customer,type Production,type Site,type Store,type WorkOrder,type Worker} from "./demo-data";
+import {cloneSeed,DEMO_DATE,money,number,randId,type Contract,type Customer,type Production,type Site,type Store,type WorkOrder,type Worker} from "./demo-data";
 type Page="Command centre"|"Mine operations"|"Fleet intelligence"|"Maintenance"|"Clients & contracts"|"Workforce"|"Analytics";
 type Modal="breakdown"|"production"|"customer"|"contract"|"worker"|"asset"|"site"|null;
 const MENU:Page[]=["Command centre","Mine operations","Fleet intelligence","Maintenance","Clients & contracts","Workforce","Analytics"];
-const symbols:Record<Page,string>={"Command centre":"◈","Mine operations":"◇","Fleet intelligence":"▰",Maintenance:"⚒","Clients & contracts":"▤",Workforce:"♙",Analytics:"▥"};
 const gauge=(value:number,max=100)=>Math.max(0,Math.min(100,value/max*100));
 function Icon({name,size=20}:{name:string;size?:number}){const paths:Record<string,React.ReactNode>={
  grid:<><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
@@ -64,7 +63,7 @@ export default function Home(){
  const unresolved=data.orders.filter(o=>o.status!=="Resolved");
  const activeSite=data.sites.find(s=>s.id===selectedSite)||data.sites[0];
  const asset=data.assets.find(a=>a.id===selectedAsset)||data.assets[0];
- const visibleAssets=useMemo(()=>data.assets.filter(a=>(siteFilter==="All"||a.siteId===siteFilter)&&[a.id,a.name,a.type,a.operator,siteName(a.siteId)].join(" ").toLowerCase().includes(search.toLowerCase())),[data.assets,data.sites,search,siteFilter]);
+ const visibleAssets=useMemo(()=>data.assets.filter(a=>(siteFilter==="All"||a.siteId===siteFilter)&&[a.id,a.name,a.type,a.operator,data.sites.find(s=>s.id===a.siteId)?.name||""].join(" ").toLowerCase().includes(search.toLowerCase())),[data.assets,data.sites,search,siteFilter]);
  const selectedSiteAssets=data.assets.filter(a=>a.siteId===selectedSite);
  const show=(what:Modal,values:Record<string,string>={})=>{setDraft(values);setModal(what)};
  const save=()=>{
