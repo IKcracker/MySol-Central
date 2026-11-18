@@ -1,69 +1,84 @@
-import Image from "next/image";
+"use client";
 
+import { useMemo, useState } from "react";
+
+type Section = "Overview" | "Mining Sites" | "Fleet & Equipment" | "Maintenance" | "Customers & Contracts" | "Workforce" | "Reports";
+type Machine = { id: string; name: string; type: string; site: string; hours: number; status: "Operational" | "Maintenance" | "Idle" };
+type Incident = { id: string; machine: string; site: string; problem: string; status: "Open" | "In progress" | "Resolved"; priority: "High" | "Medium" };
+const initialMachines: Machine[] = [
+  { id: "EX-104", name: "CAT 395", type: "Excavator", site: "North Ridge", hours: 4215, status: "Operational" },
+  { id: "DT-221", name: "Volvo A60H", type: "Haul truck", site: "West Pit", hours: 3108, status: "Operational" },
+  { id: "DZ-038", name: "Komatsu D155", type: "Dozer", site: "South Quarry", hours: 5782, status: "Maintenance" },
+  { id: "EX-118", name: "Hitachi ZX870", type: "Excavator", site: "East Basin", hours: 2834, status: "Operational" },
+  { id: "DT-236", name: "CAT 777G", type: "Haul truck", site: "North Ridge", hours: 6240, status: "Idle" },
+  { id: "LD-017", name: "CAT 988K", type: "Wheel loader", site: "West Pit", hours: 1930, status: "Operational" },
+];
+const sites = [
+  { name: "North Ridge", region: "Rustenburg cluster", target: 3700, actual: 3420, fleet: 46, state: "On track" },
+  { name: "West Pit", region: "Rustenburg cluster", target: 3200, actual: 2960, fleet: 42, state: "On track" },
+  { name: "South Quarry", region: "North West cluster", target: 2700, actual: 2120, fleet: 35, state: "Attention" },
+  { name: "East Basin", region: "North West cluster", target: 3000, actual: 2780, fleet: 40, state: "On track" },
+];
+const nav: { title: string; icon: string; items: Section[] }[] = [
+  { title: "WORKSPACE", icon: "", items: ["Overview", "Mining Sites", "Fleet & Equipment", "Maintenance"] },
+  { title: "BUSINESS", icon: "", items: ["Customers & Contracts", "Workforce", "Reports"] },
+];
+const icons: Record<Section,string> = { Overview: "◫", "Mining Sites": "▱", "Fleet & Equipment": "▰", Maintenance: "⚒", "Customers & Contracts": "◈", Workforce: "♙", Reports: "▥" };
+const fmt = (n:number) => new Intl.NumberFormat("en-ZA").format(n);
+function Badge({ value }: { value:string }) { const tone = /Operational|On track|Resolved|Active/.test(value) ? "good" : /Attention|High|Maintenance|Open/.test(value) ? "warn" : "neutral"; return <span className={`status ${tone}`}><span className="status-dot" />{value}</span>; }
+function Card({ label, value, change, icon }: { label:string; value:string; change:string; icon:string }) { return <div className="metric panel"><div className="metric-head"><span>{label}</span><span className="metric-icon">{icon}</span></div><strong>{value}</strong><small>{change}</small></div>; }
+function Bars({ values }: { values:number[] }) { return <div className="spark-bars" aria-hidden="true">{values.map((v,i)=><span key={i} style={{height:`${v}%`}} />)}</div>; }
 export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+  const [active, setActive] = useState<Section>("Overview");
+  const [machines, setMachines] = useState(initialMachines);
+  const [incidents, setIncidents] = useState<Incident[]>([{ id: "WO-1048", machine: "DZ-038", site: "South Quarry", problem: "Hydraulic pressure inspection", status: "In progress", priority: "High" }, { id: "WO-1047", machine: "DT-236", site: "North Ridge", problem: "Scheduled condition check", status: "Open", priority: "Medium" }]);
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("All sites");
+  const [showModal, setShowModal] = useState(false);
+  const [chosenMachine, setChosenMachine] = useState("EX-104");
+  const [problem, setProblem] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const onBreakdown = () => {
+    if (!problem.trim()) return;
+    const machine = machines.find(m => m.id === chosenMachine);
+    if (!machine) return;
+    const id = `WO-${1049 + incidents.length - 2}`;
+    setIncidents(prev => [{id, machine:machine.id, site:machine.site, problem:problem.trim(), status:"Open", priority:"High"}, ...prev]);
+    setMachines(prev => prev.map(m => m.id === chosenMachine ? {...m, status:"Maintenance"} : m));
+    setShowModal(false); setProblem(""); setActive("Maintenance");
+  };
+  const resolve = (id:string) => {
+    const incident = incidents.find(x=>x.id===id);
+    if (!incident) return;
+    setIncidents(prev=>prev.map(x=>x.id===id ? {...x,status:"Resolved"} : x));
+    setMachines(prev=>prev.map(m=>m.id===incident.machine ? {...m,status:"Operational"} : m));
+  };
+  const working = machines.filter(m=>m.status==="Operational").length;
+  const filteredMachines = useMemo(()=>machines.filter(m=>(filter==="All sites"||m.site===filter) && (`${m.id} ${m.name} ${m.type}`.toLowerCase().includes(query.toLowerCase()))),[machines,filter,query]);
+  const total = sites.reduce((sum,s)=>sum+s.actual,0);
+  return <div className="app-shell">
+    <aside className={`sidebar ${menuOpen?"open":""}`}>
+      <div className="brand"><div className="brand-mark"><span>⟁</span></div><div><strong>MYSOL<span className="brand-accent">.</span></strong><small>CENTRAL OPERATIONS</small></div></div>
+      <div className="workspace-switch"><span className="avatar-square">M</span><div><b>MySol Holdings</b><small>Enterprise workspace</small></div><span className="switch-arrows">⌄</span></div>
+      <nav aria-label="Main navigation">{nav.map(group=><div className="nav-group" key={group.title}><p>{group.title}</p>{group.items.map(item=><button key={item} className={`nav-item ${active===item?"selected":""}`} onClick={()=>{setActive(item);setMenuOpen(false)}}><span className="nav-icon">{icons[item]}</span><span>{item}</span>{item==="Maintenance"&&incidents.some(x=>x.status!=="Resolved")&&<i className="nav-count">{incidents.filter(x=>x.status!=="Resolved").length}</i>}</button>)}</div>)}</nav>
+      <div className="sidebar-bottom"><div className="sidebar-help"><div className="help-icon">✧</div><b>Your operations, connected.</b><p>One source of truth across sites, people and machines.</p><button onClick={()=>setActive("Reports")}>Explore insights ↗</button></div><div className="user"><span className="user-avatar">AD</span><div><b>Demo Administrator</b><small>Presentation account</small></div><span>⋯</span></div></div>
+    </aside>
+    <main className="main">
+      <header className="topbar"><div className="breadcrumb"><button className="mobile-toggle" onClick={()=>setMenuOpen(!menuOpen)} aria-label="Toggle navigation">☰</button>Workspace <span>/</span><b>{active}</b></div><div className="top-actions"><span className="demo-chip"><span className="live-dot" /> DEMO ENVIRONMENT</span><button aria-label="Notifications" className="small-icon" onClick={()=>setActive("Maintenance")}>♧</button><span className="top-avatar">AD</span></div></header>
+      <div className="content"><div className="page-heading"><div><div className="eyebrow">MYSOL CENTRAL <span> / </span> {active.toUpperCase()}</div><h1>{active==="Overview"?"Operations command centre":active}</h1><p>{active==="Overview"?"An intelligent overview of your mining operations.":active==="Maintenance"?"Track equipment faults, service activity and operational impact.":active==="Fleet & Equipment"?"Every machine, every site, one reliable equipment register.":active==="Mining Sites"?"Production and performance across your active sites.":"Unified business records and visibility across your organisation."}</p></div><div className="heading-actions"><button className="button secondary" onClick={()=>setActive("Reports")}>↗ &nbsp; View reports</button><button className="button primary" onClick={()=>setShowModal(true)}>＋ &nbsp; Report breakdown</button></div></div>
+      <div className="notice"><span>◉</span><div><b>Illustrative demonstration</b> — all sites, figures, equipment records and work orders shown here are fictional sample data, not MySol operational records.</div></div>
+      {active==="Overview"&&<><div className="stats-grid"><Card label="Production today" value={`${fmt(total)} t`} change="Across 4 illustrative sites" icon="▥"/><Card label="Equipment operational" value={`${working} / ${machines.length}`} change="Live demo fleet status" icon="▰"/><Card label="Open work orders" value={String(incidents.filter(x=>x.status!=="Resolved").length)} change="Maintenance requiring attention" icon="⚒"/><Card label="Active demo sites" value={String(sites.length).padStart(2,"0")} change="Sample operating locations" icon="◎"/></div>
+      <div className="dashboard-grid"><section className="panel production"><div className="section-head"><div><span className="section-kicker">PERFORMANCE</span><h2>Production overview</h2><p>Actual vs target production by site</p></div><span className="tiny-pill">Today ⌄</span></div><div className="chart-legend"><span><i className="legend-color actual"/>Actual tonnes</span><span><i className="legend-color target"/>Target tonnes</span></div><div className="site-chart">{sites.map(s=><div className="chart-row" key={s.name}><span>{s.name}</span><div className="chart-lines"><div className="bar target" style={{width:`${s.target/4000*100}%`}}/><div className="bar actual" style={{width:`${s.actual/4000*100}%`}}/></div><strong>{Math.round(s.actual/s.target*100)}%</strong></div>)}</div><div className="chart-footer"><span>0 t</span><span>1,000 t</span><span>2,000 t</span><span>3,000 t</span><span>4,000 t</span></div></section><section className="panel attention"><div className="section-head"><div><span className="section-kicker">ACTION CENTRE</span><h2>Needs your attention</h2><p>Unresolved operational activity</p></div><span className="circle-warning">!</span></div><div className="attention-list">{incidents.filter(x=>x.status!=="Resolved").slice(0,3).map(x=><button key={x.id} onClick={()=>setActive("Maintenance")} className="attention-item"><span className="attention-symbol">⚒</span><div><b>{x.machine} · {x.problem}</b><small>{x.site} · {x.id}</small></div><span>↗</span></button>)}</div><button className="text-link" onClick={()=>setActive("Maintenance")}>View all maintenance requests <span>→</span></button></section></div>
+      <div className="dashboard-grid bottom-grid"><section className="panel"><div className="section-head"><div><span className="section-kicker">MINE NETWORK</span><h2>Sites at a glance</h2></div><button className="text-link" onClick={()=>setActive("Mining Sites")}>View all →</button></div><div className="sites-list">{sites.map(s=><div className="site-item" key={s.name}><span className="site-icon">⌁</span><div><b>{s.name}</b><small>{s.region}</small></div><span className="site-progress"><span style={{width:`${Math.min(s.actual/s.target*100,100)}%`}}/></span><Badge value={s.state}/></div>)}</div></section><section className="panel equipment-trend"><div className="section-head"><div><span className="section-kicker">FLEET INSIGHTS</span><h2>Machine utilisation</h2><p>Illustrative weekly trend</p></div><span className="tiny-pill">Last 7 days</span></div><div className="trend-head"><strong>84.6%</strong><span>↗ 3.2% vs previous week</span></div><Bars values={[52,64,58,79,72,88,83,95,80,91,77,89,69,92,82,90,74,97,86,94,88]}/><div className="trend-days"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div></section></div></>}
+      {active==="Mining Sites"&&<div className="site-cards">{sites.map(s=><article className="panel site-card" key={s.name}><div className="site-art"><span>⛰</span><Badge value={s.state}/></div><div className="site-card-body"><span className="section-kicker">{s.region}</span><h2>{s.name}</h2><div className="site-card-details"><div><small>Production today</small><strong>{fmt(s.actual)} t</strong></div><div><small>Target</small><strong>{fmt(s.target)} t</strong></div><div><small>Assigned fleet</small><strong>{s.fleet} units</strong></div></div><div className="progress-track"><span style={{width:`${Math.min(s.actual/s.target*100,100)}%`}}/></div><small>{Math.round(s.actual/s.target*100)}% of daily target</small></div></article>)}</div>}
+      {active==="Fleet & Equipment"&&<section className="panel data-panel"><div className="section-head"><div><span className="section-kicker">ASSET REGISTER</span><h2>Fleet & equipment</h2><p>Equipment availability updates when breakdowns are reported.</p></div><span className="tiny-pill">{machines.length} demo assets</span></div><div className="table-tools"><input aria-label="Search equipment" placeholder="Search machine, ID or type..." value={query} onChange={e=>setQuery(e.target.value)}/><select aria-label="Filter by site" value={filter} onChange={e=>setFilter(e.target.value)}><option>All sites</option>{sites.map(s=><option key={s.name}>{s.name}</option>)}</select></div><div className="table-scroll"><table><thead><tr><th>Asset ID</th><th>Machine</th><th>Site</th><th>Engine hours</th><th>Status</th></tr></thead><tbody>{filteredMachines.map(m=><tr key={m.id}><td className="mono">{m.id}</td><td><b>{m.name}</b><small>{m.type}</small></td><td>{m.site}</td><td>{fmt(m.hours)} h</td><td><Badge value={m.status}/></td></tr>)}</tbody></table>{filteredMachines.length===0&&<p className="empty">No matching equipment.</p>}</div></section>}
+      {active==="Maintenance"&&<section className="panel data-panel"><div className="section-head"><div><span className="section-kicker">MAINTENANCE DESK</span><h2>Work orders</h2><p>Report a breakdown to automatically flag the asset as under maintenance.</p></div><button className="button primary" onClick={()=>setShowModal(true)}>＋ New work order</button></div><div className="table-scroll"><table><thead><tr><th>Work order</th><th>Asset</th><th>Site</th><th>Issue</th><th>Priority</th><th>Status / action</th></tr></thead><tbody>{incidents.map(i=><tr key={i.id}><td className="mono">{i.id}</td><td><b>{i.machine}</b></td><td>{i.site}</td><td>{i.problem}</td><td><Badge value={i.priority}/></td><td><div className="action-cell"><Badge value={i.status}/>{i.status!=="Resolved"&&<button className="resolve-button" onClick={()=>resolve(i.id)}>Mark resolved</button>}</div></td></tr>)}</tbody></table></div></section>}
+      {active==="Customers & Contracts"&&<section className="panel data-panel"><div className="section-head"><div><span className="section-kicker">CUSTOMER RELATIONSHIPS</span><h2>Customer & contract workspace</h2><p>A unified customer record linked to sites, contracts and delivery.</p></div></div><div className="placeholder-grid"><div className="placeholder-feature"><span>◈</span><h3>Customer 360°</h3><p>Accounts, contacts, service agreements and interactions in one place.</p></div><div className="placeholder-feature"><span>▤</span><h3>Contract lifecycle</h3><p>Monitor contract milestones, renewals, documents and approvals.</p></div><div className="placeholder-feature"><span>↗</span><h3>Commercial insights</h3><p>Connect operational performance to client-level service reporting.</p></div></div><p className="placeholder-note">Discovery module concept — sample customer identities intentionally omitted.</p></section>}
+      {active==="Workforce"&&<section className="panel data-panel"><div className="section-head"><div><span className="section-kicker">PEOPLE & CAPABILITY</span><h2>Workforce overview</h2><p>Understand people allocation and readiness across mining operations.</p></div></div><div className="placeholder-grid"><div className="placeholder-feature"><span>♙</span><h3>Employee directory</h3><p>Single personnel records with roles, departments and assigned locations.</p></div><div className="placeholder-feature"><span>◷</span><h3>Shift planning</h3><p>Track planned shifts, attendance and operator-machine assignments.</p></div><div className="placeholder-feature"><span>✓</span><h3>Compliance readiness</h3><p>Monitor training, inductions and certification expiry dates.</p></div></div><p className="placeholder-note">Concept only — no real employee or HR data is included.</p></section>}
+      {active==="Reports"&&<div className="reports-grid"><div className="panel report-summary"><span className="section-kicker">DEMO ANALYTICS</span><h2>Connected decisions, clearer operations.</h2><p>In a production rollout, reports would combine approved operational data from sites, fleet, maintenance, customer contracts and finance.</p><div className="report-metrics"><div><small>Sample production attainment</small><strong>{Math.round(total/sites.reduce((sum,s)=>sum+s.target,0)*100)}%</strong></div><div><small>Demo fleet available</small><strong>{Math.round(working/machines.length*100)}%</strong></div><div><small>Unresolved work orders</small><strong>{incidents.filter(i=>i.status!=="Resolved").length}</strong></div></div></div><div className="panel report-list"><h2>Suggested executive reports</h2>{["Production vs plan","Fleet downtime and utilisation","Work orders by priority","Site operating costs","Contract service performance"].map(x=><div key={x} className="report-row"><span>▥</span>{x}<span className="report-tag">Proposed</span></div>)}</div></div>}
+      <footer className="footer"><span>MySol Central · Enterprise concept demonstration</span><span>Oreon-inspired visual direction · Fictional demonstration data</span></footer>
+      </div>
+    </main>
+    {showModal&&<div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setShowModal(false)}}><div className="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div className="modal-heading"><div><span className="section-kicker">CONNECTED WORKFLOW</span><h2 id="modal-title">Report equipment breakdown</h2></div><button aria-label="Close" className="close-button" onClick={()=>setShowModal(false)}>×</button></div><p className="modal-description">Creating a work order automatically updates the selected machine's fleet availability.</p><label htmlFor="machine-select">Equipment</label><select id="machine-select" value={chosenMachine} onChange={e=>setChosenMachine(e.target.value)}>{machines.map(m=><option key={m.id} value={m.id}>{m.id} — {m.name} ({m.site})</option>)}</select><label htmlFor="problem">Issue description</label><textarea id="problem" placeholder="Describe the fault or incident..." value={problem} onChange={e=>setProblem(e.target.value)} rows={3}/><div className="modal-actions"><button className="button secondary" onClick={()=>setShowModal(false)}>Cancel</button><button className="button primary" disabled={!problem.trim()} onClick={onBreakdown}>Create work order →</button></div></div></div>}
+  </div>;
 }
