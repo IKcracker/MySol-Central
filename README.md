@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MySol Central — interactive mining operations sales demo
 
-## Getting Started
+An original, Oreon-inspired mining operations concept built with Next.js 16, React 19 and Tailwind 4. The prototype demonstrates how mine sites, production records, equipment, maintenance, customers, contracts and workforce data can work together in one command centre.
 
-First, run the development server:
+> **Sales concept only.** This repository is not affiliated with MySol Holdings & Logistics. Every site name, map pin, machine record, personnel name, client and performance figure is fictional. No live database, geospatial imagery, machine telematics or MySol systems are connected.
+
+## Quick start
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Presentation walkthrough
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Command centre:** Show the dark industrial dashboard, interactive schematic mine map, fleet health status, production chart and maintenance alerts.
+2. **Mine operations:** Select a site. Click **Log production**, choose a shift and enter tonnes/trips. New entries appear in the logbook and change the production totals.
+3. **Fleet intelligence:** Select a machine from the equipment register to inspect sample condition readings. Use **Report fault** to register a breakdown.
+4. **Maintenance:** The fault appears as a new work order and the machine is moved into maintenance status. Change the work order to **In progress** and then **Resolved** to restore availability, provided no other open fault is linked to the asset.
+5. **Clients & contracts:** Create a customer, then create a contract linked to the customer and an existing site.
+6. **Workforce:** Create a workforce record and change the person's duty status and shift.
+7. **Analytics:** Review linked KPIs and export site performance and operational logs as CSV.
+8. **Reset demo:** Reset all records to the original sample dataset when preparing for another presentation.
 
-## Learn More
+## Demo data behaviour
 
-To learn more about Next.js, take a look at the following resources:
+- Data is stored in the browser's `localStorage` and survives refreshes in the same browser.
+- Use **Reset demo** to restore the original sample dataset.
+- Data is not shared between browsers, devices or users. There is no authentication, API or server-side persistence.
+- The operational map is a **schematic visual**, not an actual geographic map or satellite image.
+- Demo date: 2026-11-19. Choose another date from Analytics to see that day's available records.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Build verification
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+npm run build
+```
 
-## Deploy on Vercel
+The repository also includes a GitHub Actions workflow to execute those checks. Complete browser interaction and visual QA before presenting to a client.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Future production requirements
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This concept needs discovery workshops to establish ownership and workflow requirements. Production implementation would require authenticated role-based access, a relational database, permissions, audit trails, validation, resilient integration layers, secure file storage, geospatial and telemetry providers, backups, performance monitoring, tests and an agreed data migration plan.
+
+## Design notes
+
+Inspired by the layout and information density of the Oreon mining operations interface on Dribbble. The implementation uses original UI code, generated CSS schematic terrain, and no copied proprietary design assets.
