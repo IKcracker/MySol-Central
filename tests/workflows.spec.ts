@@ -329,6 +329,25 @@ test("desktop, tablet and mobile layouts, keyboard dialogs, forms and tables", a
         () => document.documentElement.scrollWidth <= window.innerWidth,
       ),
     ).toBe(true);
+    const markerLabels = await page
+      .locator(".command-stage .map-marker > span")
+      .evaluateAll((labels) =>
+        labels.map((label) => {
+          const r = label.getBoundingClientRect();
+          return { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+        }),
+      );
+    for (let i = 0; i < markerLabels.length; i++)
+      for (let j = i + 1; j < markerLabels.length; j++) {
+        const a = markerLabels[i],
+          b = markerLabels[j];
+        expect(
+          a.right <= b.left ||
+            b.right <= a.left ||
+            a.bottom <= b.top ||
+            b.bottom <= a.top,
+        ).toBe(true);
+      }
     await page.screenshot({
       path: `qa/screenshots/test-dashboard-${name}.png`,
       fullPage: true,

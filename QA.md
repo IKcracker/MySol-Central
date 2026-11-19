@@ -50,3 +50,7 @@ Representative captures:
 - Aerial imagery and equipment photos are illustrative and do not represent the fictional site/asset IDs.
 - Local Chrome checks do not constitute a full cross-browser or assistive-technology certification.
 - Public preview status is reported only after deployment verification; no merge is performed.
+
+## Clean-run corrections
+
+The first GitHub Actions run identified that `LayoutProps` needs Next.js-generated route types on a fresh checkout. `npm run typecheck` now runs `next typegen` before TypeScript. Responsive QA also explicitly checks that every pair of command-map labels stays separate at all three viewports; tablet markers use two columns.

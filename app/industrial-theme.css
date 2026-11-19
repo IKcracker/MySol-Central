@@ -995,8 +995,34 @@ footer {
   .map-site-summary {
     display: none;
   }
-  .command-stage .map-marker:nth-last-of-type(-n + 2) {
-    margin-top: -80px;
+  .command-stage .map-marker {
+    margin-top: 0;
+  }
+  .command-stage .map-marker:nth-of-type(odd) {
+    left: 14% !important;
+  }
+  .command-stage .map-marker:nth-of-type(even) {
+    left: 62% !important;
+  }
+  .command-stage .map-marker:nth-of-type(1),
+  .command-stage .map-marker:nth-of-type(2) {
+    top: 40% !important;
+  }
+  .command-stage .map-marker:nth-of-type(3),
+  .command-stage .map-marker:nth-of-type(4) {
+    top: 47% !important;
+  }
+  .command-stage .map-marker:nth-of-type(5),
+  .command-stage .map-marker:nth-of-type(6) {
+    top: 54% !important;
+  }
+  .command-stage .map-marker:nth-of-type(7),
+  .command-stage .map-marker:nth-of-type(8) {
+    top: 61% !important;
+  }
+  .command-stage .map-marker.edge {
+    flex-direction: row;
+    transform: translate(-14px, -50%);
   }
   .command-map-title {
     top: 103px;
@@ -1156,7 +1182,7 @@ footer {
     height: 17px;
   }
   .command-stage .map-marker:nth-last-of-type(-n + 2) {
-    margin-top: 0;
+    margin-top: 54px;
   }
   .command-stage .map-marker {
     margin-top: 54px;
@@ -1198,12 +1224,6 @@ footer {
   }
   .map-site-summary b {
     font-size: 12px;
-  }
-  .command-stage .map-marker:nth-of-type(5) > span {
-    transform: translateY(-22px);
-  }
-  .command-stage .map-marker:nth-of-type(6) > span {
-    transform: translateY(22px);
   }
   .map-selection-dot {
     height: 6px;
